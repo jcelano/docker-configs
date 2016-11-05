@@ -1,0 +1,12 @@
+# our base image
+FROM mysql:5.5
+
+ENV MYSQL_ROOT_PASSWORD=nuride123!
+ENV MYSQL_DATABASE=openmrs
+ENV MYSQL_USER=openmrs
+ENV MYSQL_PASSWORD=password    
+
+#COPY db/nuride_db.cnf /etc/mysql/conf.d
+COPY db/*.sql /docker-entrypoint-initdb.d/
+
+VOLUME /var/lib/mysql

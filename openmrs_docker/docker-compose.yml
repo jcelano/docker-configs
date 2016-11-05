@@ -1,0 +1,15 @@
+version: "2"
+
+# docker ps -a | grep 'ago' | awk '{print $1}' | xargs  docker rm
+# docker-compose stop && docker-compose rm -f
+# docker build -t testdb -f Dockerfile-openmrs-db . 
+# docker run -it --name testdb1_instance  testdb
+services:
+  db:
+    build:
+        context: .
+        dockerfile: Dockerfile-openmrs-db
+    ports:  
+        - "3306:3306"
+    volumes:
+      - /var/lib/mysql
