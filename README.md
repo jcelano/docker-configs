@@ -2,17 +2,19 @@
 
 A set of docker configurations for various environments
 
-## openmrs_docker
-
-A docker compose configuration that contains a working DB with openMRS, the db user=openmrs and the password=password
-
 ## Usage
 
-this will get your instance up and running, you will need to install Docker and Docker Compose, then...
+in general, this will get your instance up and running, you will need to install Docker and Docker Compose, then...
 
 ```
 docker-compose stop && docker-compose rm -f && docker-compose up --force-recreate --build
 ```
+
+## Containers
+### openmrs_docker
+
+A docker compose configuration that contains a working DB with openMRS, the db user=openmrs and the password=password
+
 
 ## Contributing
 
