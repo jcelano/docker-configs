@@ -4,6 +4,7 @@ version: "2"
 # docker-compose stop && docker-compose rm -f
 # docker build -t testdb -f Dockerfile-openmrs-db . 
 # docker run -it --name testdb1_instance  testdb
+# remove dangling volumes --> docker volume rm $(docker volume ls -f dangling=true -q)
 services:
   db:
     build:
@@ -13,3 +14,11 @@ services:
         - "3306:3306"
     volumes:
       - /var/lib/mysql
+#  web:
+#    build:
+#        context: .
+#        dockerfile: Dockerfile-openmrs-web
+#    ports:  
+#        - "8080:8080"
+#    volumes:
+#      - openmrs_dev_web:/var/lib/mysql

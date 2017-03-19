@@ -1,0 +1,22 @@
+# our base image
+FROM ubuntu
+
+EXPOSE 8080
+
+RUN apt-get update && apt-get install -y \
+  git \
+  mvn
+  
+RUN git clone https://github.com/openmrs/openmrs-core.git --branch 1.10.x openmrs-core
+RUN git clone https://github.com/PIH/openmrs-module-pihcore.git pihcore
+RUN git clone https://github.com/PIH/openmrs-module-mirebalais.git mirebalais
+RUN mvn clean install -DskipTests -s openmrs-core/pom.xml
+RUN mvn clean install -DskipTests -s pihcore/pom.xml
+RUN mvn clean install -DskipTests -Pdistribution -s mirebalais/pom.xml
+
+
+#CMD ["bash", "/tmp/startup.sh", "--debug"]
+
+
+
+
