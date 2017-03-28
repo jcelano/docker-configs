@@ -7,6 +7,7 @@ EXPOSE 8080
 # it's weird b/c from command line this works:
 #     mysql -h openmrsdocker_db_1 -uopenmrs -ppassword
 # but the openmrs properties file only works with the IP Adresss
+
 RUN apt-get update && apt-get install -y \
   default-jdk \
   git \
@@ -22,7 +23,7 @@ RUN cd /openmrs-dev/openmrs-core && mvn clean install -DskipTests
 RUN cd /openmrs-dev/mirebalais && mvn clean install -DskipTests -Pdistribution
 RUN mkdir /openmrs-dev/openmrs_home && mkdir /openmrs-dev/openmrs_home/modules
 RUN cp -v /openmrs-dev/mirebalais/distro/target/distro/*.omod /openmrs-dev/openmrs_home/modules
-COPY openmrs-runtime.properties /openmrs-dev/openmrs-core/webapp/
+COPY web/openmrs-runtime.properties /openmrs-dev/openmrs-core/webapp/
 
 #  do this one if you want to be able to login and debug stuff
 #CMD ["tail", "-F", "-n0", "/etc/hosts"]
