@@ -1,8 +1,7 @@
 version: "2"
-
 # docker ps -a | grep 'ago' | awk '{print $1}' | xargs  docker rm
 # docker-compose stop && docker-compose rm -f
-# docker build -t testdb -f Dockerfile-openmrs-db . 
+# docker build -t testdb -f Dockerfile-openmrs-db .
 # docker run -it --name testdb1_instance  testdb
 # remove dangling volumes --> docker volume rm $(docker volume ls -f dangling=true -q)
 services:
@@ -10,15 +9,17 @@ services:
     build:
         context: .
         dockerfile: Dockerfile-openmrs-db
-    ports:  
+    ports:
         - "3306:3306"
     volumes:
       - /var/lib/mysql
-#  web:
-#    build:
-#        context: .
-#        dockerfile: Dockerfile-openmrs-web
-#    ports:  
-#        - "8080:8080"
-#    volumes:
-#      - openmrs_dev_web:/var/lib/mysql
+  web:
+   build:
+       context: .
+       dockerfile: Dockerfile-openmrs-web
+   ports:
+       - "8787:8080"
+   depends_on:
+       - "db"
+   volumes:
+       - /usr/share/openmrs

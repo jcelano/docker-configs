@@ -3,20 +3,32 @@ FROM ubuntu
 
 EXPOSE 8080
 
+# installing the mysql client so that you can debug the db connection
+# it's weird b/c from command line this works:
+#     mysql -h openmrsdocker_db_1 -uopenmrs -ppassword
+# but the openmrs properties file only works with the IP Adresss
 RUN apt-get update && apt-get install -y \
+  default-jdk \
   git \
-  mvn
-  
-RUN git clone https://github.com/openmrs/openmrs-core.git --branch 1.10.x openmrs-core
-RUN git clone https://github.com/PIH/openmrs-module-pihcore.git pihcore
-RUN git clone https://github.com/PIH/openmrs-module-mirebalais.git mirebalais
-RUN mvn clean install -DskipTests -s openmrs-core/pom.xml
-RUN mvn clean install -DskipTests -s pihcore/pom.xml
-RUN mvn clean install -DskipTests -Pdistribution -s mirebalais/pom.xml
+  maven \
+  tomcat7 \
+  mysql-client
 
+RUN git clone https://github.com/openmrs/openmrs-core.git --branch 1.10.x openmrs-dev/openmrs-core
+#RUN git clone https://github.com/PIH/openmrs-module-pihcore.git openmrs-dev/pihcore
+RUN git clone https://github.com/PIH/openmrs-module-mirebalais.git openmrs-dev/mirebalais
+RUN cd /openmrs-dev/openmrs-core && mvn clean install -DskipTests
+#RUN cd /openmrs-dev/pihcore && mvn clean install -DskipTests
+RUN cd /openmrs-dev/mirebalais && mvn clean install -DskipTests -Pdistribution
+RUN mkdir /openmrs-dev/openmrs_home && mkdir /openmrs-dev/openmrs_home/modules
+RUN cp -v /openmrs-dev/mirebalais/distro/target/distro/*.omod /openmrs-dev/openmrs_home/modules
+COPY openmrs-runtime.properties /openmrs-dev/openmrs-core/webapp/
 
-#CMD ["bash", "/tmp/startup.sh", "--debug"]
+#  do this one if you want to be able to login and debug stuff
+#CMD ["tail", "-F", "-n0", "/etc/hosts"]
 
+#  this would start tomcat if you were running OpenMRS that way
+#CMD service tomcat start && tail -f /var/lib/tomcat/logs/catalina.out
 
-
-
+#  this will run OpenMRS in debug mode, not sure if this is how it is done in production
+CMD cd /openmrs-dev/openmrs-core/webapp && mvn jetty:run
