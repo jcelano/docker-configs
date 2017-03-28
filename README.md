@@ -6,9 +6,20 @@ A set of docker configurations for various environments
 
 in general, this will get your instance up and running, you will need to install Docker and Docker Compose, then...
 
+## Using docker Compose
+docker-compose up
+
+### Using just docker
 ```
 docker-compose stop && docker-compose rm -f && docker-compose up --force-recreate --build
 ```
+
+## Logging into the instance
+docker exec -it openmrsdocker_web_1 "/bin/bash"
+
+##Access the DB from the web instance for testing
+ mysql -h openmrsdocker_db_1 -uopenmrs -ppassword
+
 
 ## Containers
 ### openmrs_docker
@@ -27,7 +38,7 @@ A docker compose configuration that contains a working DB with openMRS, the db u
 ## Build with
 
 
-* [Docker](https://www.docker.com/) - the container platform 
+* [Docker](https://www.docker.com/) - the container platform
 * [Docker-compose](https://docs.docker.com/compose/) - the start up tool for defining and running the containers
 
 ## Credits
