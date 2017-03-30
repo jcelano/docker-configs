@@ -1,29 +1,31 @@
 # our base image
-FROM ubuntu
+FROM tomcat:7-jre7
 
-EXPOSE 8080
-
-# installing the mysql client so that you can debug the db connection
-# it's weird b/c from command line this works:
-#     mysql -h openmrsdocker_db_1 -uopenmrs -ppassword
-# but the openmrs properties file only works with the IP Adresss
+#EXPOSE 8080
 
 RUN apt-get update && apt-get install -y \
-  default-jdk \
   git \
   maven \
-  tomcat7 \
-  mysql-client
+  mysql-client \
+  openjdk-7-jdk
 
-RUN git clone https://github.com/openmrs/openmrs-core.git --branch 1.10.x openmrs-dev/openmrs-core
-#RUN git clone https://github.com/PIH/openmrs-module-pihcore.git openmrs-dev/pihcore
-RUN git clone https://github.com/PIH/openmrs-module-mirebalais.git openmrs-dev/mirebalais
-RUN cd /openmrs-dev/openmrs-core && mvn clean install -DskipTests
-#RUN cd /openmrs-dev/pihcore && mvn clean install -DskipTests
+
+ENV JAVA_OPTS="-Xmx3072m -Xms1024m -XX:PermSize=256m -XX:MaxPermSize=512m -XX:NewSize=128m -Djava.awt.headless=true -Djava.awt.headlesslib=true"
+RUN rm -rf /usr/local/tomcat/webapps/*
+RUN mkdir /openmrs-dev && mkdir /openmrs-dev/openmrs_home && mkdir /openmrs-dev/openmrs_home/modules
+
+#WE COULD DOWNLOAD THE LATEST
+#RUN wget -O /usr/local/tomcat/webapps/openmrs.war https://sourceforge.net/projects/openmrs/files/releases/OpenMRS_Platform_2.0.4.1/openmrs.war/download
+ADD web/openmrs.war /usr/local/tomcat/webapps/openmrs.war
+ADD web/openmrs-runtime.properties /root/.OpenMRS/openmrs-runtime.properties
+#ADD web/modules/*.omod /openmrs-dev/openmrs_home/modules/
+
+#build and deploy mirebalais
+RUN git clone https://github.com/PIH/openmrs-module-mirebalais.git /openmrs-dev/mirebalais
 RUN cd /openmrs-dev/mirebalais && mvn clean install -DskipTests -Pdistribution
-RUN mkdir /openmrs-dev/openmrs_home && mkdir /openmrs-dev/openmrs_home/modules
-RUN cp -v /openmrs-dev/mirebalais/distro/target/distro/*.omod /openmrs-dev/openmrs_home/modules
-COPY web/openmrs-runtime.properties /openmrs-dev/openmrs-core/webapp/
+RUN cp -v /openmrs-dev/mirebalais/distro/target/distro/*.omod /openmrs-dev/openmrs_home/modules/
+
+
 
 #  do this one if you want to be able to login and debug stuff
 #CMD ["tail", "-F", "-n0", "/etc/hosts"]
@@ -32,4 +34,4 @@ COPY web/openmrs-runtime.properties /openmrs-dev/openmrs-core/webapp/
 #CMD service tomcat start && tail -f /var/lib/tomcat/logs/catalina.out
 
 #  this will run OpenMRS in debug mode, not sure if this is how it is done in production
-CMD cd /openmrs-dev/openmrs-core/webapp && mvn jetty:run
+#CMD cd /openmrs-dev/openmrs-core/webapp && mvn jetty:run
